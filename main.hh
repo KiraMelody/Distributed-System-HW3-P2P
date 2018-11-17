@@ -19,6 +19,9 @@ public slots:
 private:
 	QTextEdit *textview;
 	QLineEdit *textline;
+	quint8 seqNum;
+	quint16 portNum;
+	QMap<quint8, QString> messageQueue;
 };
 
 class NetSocket : public QUdpSocket

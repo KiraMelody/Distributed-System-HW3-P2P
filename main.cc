@@ -49,6 +49,30 @@ void ChatDialog::gotReturnPressed()
 	textline->clear();
 }
 
+void ChatDialog::serializeMessage(QVariantMap message) 
+{
+	// To serialize a message you’ll need to construct a QVariantMap describing the message
+}
+
+void ChatDialog::deserializeMessage(QByteArray datagram)
+{
+	// using QDataStream, and handle the message as appropriate
+	// containing a ChatText key with a value of type QString
+	QVariantMap message;
+	QDataStream inStream(&datagram, QIODevice::ReadOnly);
+	inStream >> message;
+}
+
+void ChatDialog::setTimeout()
+{
+	// Use QTimer
+}
+
+void ChatDialog::vectorClock()
+{
+	// Use QTimer
+}
+
 NetSocket::NetSocket()
 {
 	// Pick a range of four UDP ports to try to allocate by default,

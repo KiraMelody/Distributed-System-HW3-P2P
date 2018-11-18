@@ -35,6 +35,8 @@ ChatDialog::ChatDialog() {
     // so that we can send the message entered by the user.
     connect(textline, SIGNAL(returnPressed()),
             this, SLOT(gotReturnPressed()));
+    connect(socket, SIGNAL(readyRead()),
+			this, SLOT(receiveDatagrams()));
 }
 
 void ChatDialog::gotReturnPressed() {
@@ -43,10 +45,36 @@ void ChatDialog::gotReturnPressed() {
     qDebug() << "FIX: send message to other peers: " << textline->text();
     textview->append(textline->text());
 
+    // process the message vis socket
+    QString message = textline->text();
+    if (messageDict.contains(QString(portNum))) {
+    	QStringList myMessage = messageDict[QString(portNum)];
+    	myMessage.insert(message);
+    	messageDict[QString(portNum)] = myMessage;
+    } else {
+    	QStringList myMessage = (QStringList() << "");
+    	myMessage.insert(message);
+    	messageDict[QString(portNum)] = myMessage;
+    }
+	sendRumorMessage(QString(portNum), quint32(SeqNo));
+	SeqNo += 1;
+
     // Clear the textline to get ready for the next input message.
     textline->clear();
 }
-
+void ChatDialog::receiveDatagrams()
+{
+	while (socket->hasPendingDatagrams()) {
+		QByteArray datagram;
+		datagram.resize(socket->pendingDatagramSize());
+		QHostAddress sender;
+		quint16 senderPort;
+	 
+		if(socket->readDatagram(datagram.data(), datagram.size(), &sender, &senderPort) != -1) {
+			deserializeMessage(datagram);
+		}
+	}
+}
 void ChatDialog::findPort() {
 	if (portNum == socket->myPortMax) {
 		return portNum - 1;
@@ -126,19 +154,36 @@ void ChatDialog::receiveStatusMessage(QVariantMap message) {
     	if (messageDict.contains(origin)) {
     		quint32 last_seqno = messageDict[origin].size();
     		if (seqno > last_seqno) { // find this user need to update the message from origin
-    			sendStatusMessage(origin, quint16(last_seqno + 1));
+    			sendStatusMessage(origin, quint32(last_seqno + 1));
     		} else {				  // find sender need to update the message from origin
-    			sendRumorMessage(origin, quint16(seqno + 1));
+    			sendRumorMessage(origin, quint32(seqno + 1));
     		}
 
     	} else {
-			sendStatusMessage(origin, quint16(0));
+			sendStatusMessage(origin, quint32(0));
 		}
     }
 }
 
-void ChatDialog::sendStatusMessage() {
+void ChatDialog::sendRumorMessage(Qstring origin, quint32 seqno) {
+	QVariantMap message;
+	if (messageDict[origin].size() > seqno)
+	{	
+		message.insert(QString("ChatText"), messageDict[origin].at(seqno));
+		message.insert(QString("Origin"), QString(origin));
+		message.insert(QString("SeqNo"), quint32(seqno));
+	
+		serializeMessage(message);
+	}
+}
 
+void ChatDialog::sendStatusMessage(Qstring origin, quint32 seqno) {
+	QVariantMap message;
+	QVariantMap inner;
+
+	inner.insert(origin, seqno);
+	message.insert(Qstring('Want'), inner);
+	serializeMessage(message);
 }
 
 void ChatDialog::setTimeout() {

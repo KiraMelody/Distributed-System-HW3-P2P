@@ -74,7 +74,7 @@ void ChatDialog::gotReturnPressed() {
 }
 void ChatDialog::receiveDatagrams()
 {
-    qDebug() << "receive datagram\n";
+    qDebug() << "receive datagram";
 	while (socket->hasPendingDatagrams()) {
 		QByteArray datagram;
 		datagram.resize(socket->pendingDatagramSize());
@@ -103,7 +103,7 @@ quint16 ChatDialog::findPort() {
 void ChatDialog::serializeMessage(QVariantMap message) {
     // To serialize a message you’ll need to construct a QVariantMap describing
     // the message
-    qDebug() << "serialize Message\n";
+    qDebug() << "serialize Message";
 	QByteArray datagram;
 	QDataStream outStream(&datagram, QIODevice::ReadWrite); 
 	outStream << message;
@@ -111,14 +111,15 @@ void ChatDialog::serializeMessage(QVariantMap message) {
 	quint16 destPort = findPort();
     qDebug() << "Sending message to port: " << destPort;
 
-	socket->writeDatagram(datagram.data(), datagram.size(), QHostAddress::LocalHost, findPort());
+	socket->writeDatagram(
+	        datagram.data(), datagram.size(), QHostAddress::LocalHost, destPort);
 	setTimeout();
 }
 
 void ChatDialog::deserializeMessage(QByteArray datagram) {
     // using QDataStream, and handle the message as appropriate
     // containing a ChatText key with a value of type QString
-    qDebug() << "deserialize Message\n";
+    qDebug() << "deserialize Message";
     QVariantMap message;
     QDataStream inStream(&datagram, QIODevice::ReadOnly);
     inStream >> message;
@@ -131,7 +132,7 @@ void ChatDialog::deserializeMessage(QByteArray datagram) {
 
 void ChatDialog::receiveRumorMessage(QVariantMap message) {
     // <”ChatText”,”Hi”> <”Origin”,”tiger”> <”SeqNo”,23>
-    qDebug() << "receive RumorMessage\n";
+    qDebug() << "receive RumorMessage";
     if (!message.contains("ChatText") ||
         !message.contains("Origin") ||
         !message.contains("SeqNo")) {
@@ -161,7 +162,7 @@ void ChatDialog::receiveRumorMessage(QVariantMap message) {
 
 void ChatDialog::receiveStatusMessage(QVariantMap message) {
     // <"Want",<"tiger",4>> 4 is the message don't have
-    qDebug() << "receive StatusMessage\n";
+    qDebug() << "receive StatusMessage";
     QVariantMap statusMap = qvariant_cast<QVariantMap>(message["Want"]);
     QList<QString> messageOriginList = statusMap.keys();
     for (QString origin: statusMap.keys()) {
@@ -181,7 +182,7 @@ void ChatDialog::receiveStatusMessage(QVariantMap message) {
 }
 
 void ChatDialog::sendRumorMessage(QString origin, quint32 seqno) {
-    qDebug() << "send RumorMessage\n";
+    qDebug() << "send RumorMessage";
 	QVariantMap message;
 	if (messageDict[origin].size() > seqno)
 	{	
@@ -194,7 +195,7 @@ void ChatDialog::sendRumorMessage(QString origin, quint32 seqno) {
 }
 
 void ChatDialog::sendStatusMessage(QString origin, quint32 seqno) {
-    qDebug() << "send StatusMessage\n";
+    qDebug() << "send StatusMessage";
 	QVariantMap message;
 	QVariantMap inner;
 

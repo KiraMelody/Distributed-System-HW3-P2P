@@ -53,7 +53,7 @@ void ChatDialog::findPort() {
 	} else if (portNum == socket->myPortMin) {
 		return portNum + 1;
 	} else {
-		if (rand() % 2 == 0) {
+		if (qrand() % 2 == 0) {
 			return portNum - 1;
 		} else {
 			return portNum + 1;

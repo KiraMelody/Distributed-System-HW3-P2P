@@ -19,7 +19,7 @@ public slots:
 private:
 	QTextEdit *textview;
 	QLineEdit *textline;
-	quint8 seqNum;
+	quint32 seqNo;
 	quint16 portNum;
 	QMap<quint8, QString> messageQueue;
 };

@@ -73,6 +73,16 @@ void ChatDialog::vectorClock()
 	// Use QTimer
 }
 
+void ChatDialog::rumorMessage()
+{
+	// <”ChatText”,”Hi”> <”Origin”,”tiger”> <”SeqNo”,23>
+}
+
+void ChatDialog::statusMessage()
+{
+	// <"Want",<"tiger",4>>
+}
+
 NetSocket::NetSocket()
 {
 	// Pick a range of four UDP ports to try to allocate by default,

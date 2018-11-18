@@ -16,6 +16,7 @@ ChatDialog::ChatDialog() {
 	} else {
 		portNum = socket->port;
 		originName = QVariant(portNum).toString();
+        qDebug() << "origin name: " << originName;
 	}
     seqNo = 1;
 

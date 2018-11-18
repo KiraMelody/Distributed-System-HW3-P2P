@@ -88,6 +88,7 @@ quint16 ChatDialog::findPort() {
 		}
 	}
 }
+
 void ChatDialog::serializeMessage(QVariantMap message) {
     // To serialize a message you’ll need to construct a QVariantMap describing
     // the message

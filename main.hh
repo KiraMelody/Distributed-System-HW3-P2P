@@ -16,6 +16,8 @@ public:
     void deserializeMessage(QByteArray datagram);
 	void receiveRumorMessage(QVariantMap message);
 	void receiveStatusMessage(QVariantMap message);
+	void sendStatusMessage(Qstring origin, quint32 seqno);
+	void sendRumorMessage(Qstring origin, quint32 seqno);
     void setTimeout();
     void vectorClock();
 
@@ -26,6 +28,7 @@ private:
 	QTextEdit *textview;
 	QLineEdit *textline;
 	NetSocket *socket;
+	QTimer *timer;
 	quint32 seqNo;
 	quint16 portNum;
 	QMap<QString, QStringList> messageDict;

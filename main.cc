@@ -80,12 +80,17 @@ void ChatDialog::receiveRumorMessage(QVariantMap message) {
     QString messageOrigin = message["Origin"].toString();
     quint32 messageSeqNo = message["SeqNo"].toUint();
 
-    if (messageDict.contains(messageKey) && messageDict[messageOrigin].length() > messageSeqNo) {
-        // skip duplicate.
+    if (messageDict.contains(messageOrigin) &&
+        messageDict[messageOrigin].length() != messageSeqNo) {
+        // skip duplicate and disorder.
         return;
     } else {
         textview->append(messageOrigin + ": ");
         textview->append(messageChatText);
+        if (!messageDict.contains(messageOrigin)) {
+            messageDict[messageOrigin] = (QStringList() << "");  // skip 0 index.
+        }
+        messageDict[messageOrigin].append(messageChatText);
     }
 }
 

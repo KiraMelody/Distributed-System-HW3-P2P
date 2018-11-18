@@ -50,6 +50,7 @@ void ChatDialog::gotReturnPressed() {
 void ChatDialog::serializeMessage(QVariantMap message) {
     // To serialize a message you’ll need to construct a QVariantMap describing
     // the message
+
 }
 
 void ChatDialog::deserializeMessage(QByteArray datagram) {
@@ -88,7 +89,7 @@ void ChatDialog::receiveRumorMessage(QVariantMap message) {
         textview->append(messageOrigin + ": ");
         textview->append(messageChatText);
         if (!messageDict.contains(messageOrigin)) {
-            messageDict[messageOrigin] = (QStringList() << "");  // skip 0 index.
+            messageDict[messageOrigin] = (QStringList() << ""); // skip 0 index.
         }
         messageDict[messageOrigin].append(messageChatText);
     }

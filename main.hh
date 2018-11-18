@@ -21,7 +21,7 @@ private:
 	QLineEdit *textline;
 	quint32 seqNo;
 	quint16 portNum;
-	QMap<quint8, QString> messageQueue;
+	QMap<quint32, QString> messageQueue;
 };
 
 class NetSocket : public QUdpSocket

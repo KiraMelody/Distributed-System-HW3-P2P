@@ -155,6 +155,7 @@ void ChatDialog::receiveRumorMessage(QVariantMap message) {
             messageDict[messageOrigin] = (QStringList() << ""); // skip 0 index.
         }
         messageDict[messageOrigin].append(messageChatText);
+        sendRumorMessage(messageOrigin, messageSeqNo);
     }
 }
 

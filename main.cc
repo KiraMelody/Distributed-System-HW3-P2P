@@ -49,15 +49,15 @@ void ChatDialog::gotReturnPressed() {
     QString message = textline->text();
     if (messageDict.contains(QString(portNum))) {
     	QStringList myMessage = messageDict[QString(portNum)];
-    	myMessage.insert(message);
+    	myMessage.append(message);
     	messageDict[QString(portNum)] = myMessage;
     } else {
     	QStringList myMessage = (QStringList() << "");
-    	myMessage.insert(message);
+    	myMessage.append(message);
     	messageDict[QString(portNum)] = myMessage;
     }
-	sendRumorMessage(QString(portNum), quint32(SeqNo));
-	SeqNo += 1;
+	sendRumorMessage(QString(portNum), quint32(seqNo));
+	seqNo += 1;
 
     // Clear the textline to get ready for the next input message.
     textline->clear();
@@ -75,7 +75,7 @@ void ChatDialog::receiveDatagrams()
 		}
 	}
 }
-void ChatDialog::findPort() {
+quint16 ChatDialog::findPort() {
 	if (portNum == socket->myPortMax) {
 		return portNum - 1;
 	} else if (portNum == socket->myPortMin) {
@@ -127,7 +127,7 @@ void ChatDialog::receiveRumorMessage(QVariantMap message) {
 
     QString messageChatText = message["ChatText"].toString();
     QString messageOrigin = message["Origin"].toString();
-    quint32 messageSeqNo = message["SeqNo"].toUint();
+    quint32 messageSeqNo = message["SeqNo"].toUInt();
 
     if (messageDict.contains(messageOrigin) &&
         messageDict[messageOrigin].length() != messageSeqNo) {
@@ -146,7 +146,7 @@ void ChatDialog::receiveRumorMessage(QVariantMap message) {
 void ChatDialog::receiveStatusMessage(QVariantMap message) {
     // <"Want",<"tiger",4>> 4 is the message don't have
 
-    QVariantMap statusMap = message['Want'];
+    QVariantMap statusMap = qvariant_cast<QVariantMap>(message["Want"]);
     QList<QString> messageOriginList = statusMap.keys();
     for (QString origin: statusMap.keys()) {
     	quint32 seqno = statusMap[origin].value<quint32>();
@@ -164,7 +164,7 @@ void ChatDialog::receiveStatusMessage(QVariantMap message) {
     }
 }
 
-void ChatDialog::sendRumorMessage(Qstring origin, quint32 seqno) {
+void ChatDialog::sendRumorMessage(QString origin, quint32 seqno) {
 	QVariantMap message;
 	if (messageDict[origin].size() > seqno)
 	{	
@@ -176,12 +176,12 @@ void ChatDialog::sendRumorMessage(Qstring origin, quint32 seqno) {
 	}
 }
 
-void ChatDialog::sendStatusMessage(Qstring origin, quint32 seqno) {
+void ChatDialog::sendStatusMessage(QString origin, quint32 seqno) {
 	QVariantMap message;
 	QVariantMap inner;
 
 	inner.insert(origin, seqno);
-	message.insert(Qstring('Want'), inner);
+	message.insert(QString("Want"), inner);
 	serializeMessage(message);
 }
 

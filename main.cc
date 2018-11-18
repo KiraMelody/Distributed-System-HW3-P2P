@@ -47,10 +47,30 @@ void ChatDialog::gotReturnPressed() {
     textline->clear();
 }
 
+void ChatDialog::findPort() {
+	if (portNum == socket->myPortMax) {
+		return portNum - 1;
+	} else if (portNum == socket->myPortMin) {
+		return portNum + 1;
+	} else {
+		if (qrand() % 2 == 0) {
+			return portNum - 1;
+		} else {
+			return portNum + 1;
+		}
+	}
+}
 void ChatDialog::serializeMessage(QVariantMap message) {
     // To serialize a message you’ll need to construct a QVariantMap describing
     // the message
+    //Create a byte array variable to store the byte string
+	QByteArray datagram;
+	QDataStream outStream(&datagram, QIODevice::ReadWrite); 
+	outStream << message;
+	
+	socket->writeDatagram(datagram.data(), datagram.size(), QHostAddress::LocalHost, findPort());
 
+	setTimeout();
 }
 
 void ChatDialog::deserializeMessage(QByteArray datagram) {
@@ -96,7 +116,28 @@ void ChatDialog::receiveRumorMessage(QVariantMap message) {
 }
 
 void ChatDialog::receiveStatusMessage(QVariantMap message) {
-    // <"Want",<"tiger",4>>
+    // <"Want",<"tiger",4>> 4 is the message don't have
+
+    QVariantMap statusMap = message['Want'];
+    QList<QString> messageOriginList = statusMap.keys();
+    for (QString origin: statusMap.keys()) {
+    	quint32 seqno = statusMap[origin].value<quint32>();
+    	if (messageDict.contains(origin)) {
+    		quint32 last_seqno = messageDict[origin].size();
+    		if (seqno > last_seqno) { // find this user need to update the message from origin
+    			sendStatusMessage(origin, quint16(last_seqno + 1));
+    		} else {				  // find sender need to update the message from origin
+    			sendRumorMessage(origin, quint16(seqno + 1));
+    		}
+
+    	} else {
+			sendStatusMessage(origin, quint16(0));
+		}
+    }
+}
+
+void ChatDialog::sendStatusMessage() {
+
 }
 
 void ChatDialog::setTimeout() {

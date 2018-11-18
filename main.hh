@@ -30,7 +30,6 @@ public:
 	quint16 findPort();
     void serializeMessage(QVariantMap message);
     void deserializeMessage(QByteArray datagram);
-    void receiveDatagrams();
 	void receiveRumorMessage(QVariantMap message);
 	void receiveStatusMessage(QVariantMap message);
 	void sendStatusMessage(QString origin, quint32 seqno);
@@ -40,6 +39,7 @@ public:
 
 public slots:
 	void gotReturnPressed();
+    void receiveDatagrams();
 
 private:
 	QTextEdit *textview;

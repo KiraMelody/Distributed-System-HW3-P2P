@@ -61,6 +61,11 @@ void ChatDialog::deserializeMessage(QByteArray datagram)
 	QVariantMap message;
 	QDataStream inStream(&datagram, QIODevice::ReadOnly);
 	inStream >> message;
+	if (message.contains("Want")) {
+		receiveStatusMessage(message);
+	} else {
+		receiveRumorMessage(message);
+	}
 }
 
 void ChatDialog::setTimeout()
@@ -73,12 +78,12 @@ void ChatDialog::vectorClock()
 	// Use QTimer
 }
 
-void ChatDialog::rumorMessage()
+void ChatDialog::receiveRumorMessage(QVariantMap message)
 {
 	// <”ChatText”,”Hi”> <”Origin”,”tiger”> <”SeqNo”,23>
 }
 
-void ChatDialog::statusMessage()
+void ChatDialog::receiveStatusMessage(QVariantMap message)
 {
 	// <"Want",<"tiger",4>>
 }

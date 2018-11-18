@@ -55,16 +55,16 @@ void ChatDialog::gotReturnPressed() {
 
     // process the message vis socket
     QString message = textline->text();
-    if (messageDict.contains(QString(portNum))) {
-    	QStringList myMessage = messageDict[QString(portNum)];
+    if (messageDict.contains(QString::number(portNum))) {
+    	QStringList myMessage = messageDict[QString::number(portNum)];
     	myMessage.append(message);
-    	messageDict[QString(portNum)] = myMessage;
+    	messageDict[QString::number(portNum)] = myMessage;
     } else {
     	QStringList myMessage = (QStringList() << "");
     	myMessage.append(message);
-    	messageDict[QString(portNum)] = myMessage;
+    	messageDict[QString::number(portNum)] = myMessage;
     }
-	sendRumorMessage(QString(portNum), quint32(seqNo));
+	sendRumorMessage(QString::number(portNum), quint32(seqNo));
 	seqNo += 1;
 
     // Clear the textline to get ready for the next input message.

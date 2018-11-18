@@ -15,6 +15,7 @@ ChatDialog::ChatDialog() {
 		exit(1);
 	} else {
 		portNum = socket->port;
+		originName = QVariant(portNum).toString();
 	}
     seqNo = 1;
 
@@ -55,16 +56,16 @@ void ChatDialog::gotReturnPressed() {
 
     // process the message vis socket
     QString message = textline->text();
-    if (messageDict.contains(QString::number(portNum))) {
-    	QStringList myMessage = messageDict[QString::number(portNum)];
+    if (messageDict.contains(originName)) {
+    	QStringList myMessage = messageDict[originName];
     	myMessage.append(message);
-    	messageDict[QString::number(portNum)] = myMessage;
+    	messageDict[originName] = myMessage;
     } else {
     	QStringList myMessage = (QStringList() << "");
     	myMessage.append(message);
-    	messageDict[QString::number(portNum)] = myMessage;
+    	messageDict[originName] = myMessage;
     }
-	sendRumorMessage(QString::number(portNum), quint32(seqNo));
+	sendRumorMessage(originName, quint32(seqNo));
 	seqNo += 1;
 
     // Clear the textline to get ready for the next input message.

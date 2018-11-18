@@ -46,6 +46,7 @@ private:
 	QLineEdit *textline;
 	NetSocket *socket;
 	QTimer *timer;
+	QString originName;
 	quint32 seqNo;
 	quint16 portNum;
 	QMap<QString, QStringList> messageDict;

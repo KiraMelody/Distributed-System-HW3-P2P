@@ -25,6 +25,7 @@ public slots:
 private:
 	QTextEdit *textview;
 	QLineEdit *textline;
+	NetSocket *socket;
 	quint32 seqNo;
 	quint16 portNum;
 	QMap<QString, QStringList> messageDict;

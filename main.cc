@@ -10,6 +10,14 @@
 ChatDialog::ChatDialog() {
     setWindowTitle("P2Papp");
 
+    socket = new NetSocket();
+	if (!socket->bind()) {
+		exit(1);
+	} else {
+		portNum = socket->port;
+	}
+    seqNo = 1;
+
     // Read-only text box where we display messages from everyone.
     // This widget expands both horizontally and vertically.
     textview = new QTextEdit(this);
@@ -64,6 +72,7 @@ void ChatDialog::gotReturnPressed() {
 }
 void ChatDialog::receiveDatagrams()
 {
+	printf("receive datagram\n");
 	while (socket->hasPendingDatagrams()) {
 		QByteArray datagram;
 		datagram.resize(socket->pendingDatagramSize());
@@ -92,7 +101,7 @@ quint16 ChatDialog::findPort() {
 void ChatDialog::serializeMessage(QVariantMap message) {
     // To serialize a message you’ll need to construct a QVariantMap describing
     // the message
-    //Create a byte array variable to store the byte string
+    printf("serialize Message\n");
 	QByteArray datagram;
 	QDataStream outStream(&datagram, QIODevice::ReadWrite); 
 	outStream << message;
@@ -105,6 +114,7 @@ void ChatDialog::serializeMessage(QVariantMap message) {
 void ChatDialog::deserializeMessage(QByteArray datagram) {
     // using QDataStream, and handle the message as appropriate
     // containing a ChatText key with a value of type QString
+    printf("deserialize Message\n");
     QVariantMap message;
     QDataStream inStream(&datagram, QIODevice::ReadOnly);
     inStream >> message;
@@ -117,7 +127,7 @@ void ChatDialog::deserializeMessage(QByteArray datagram) {
 
 void ChatDialog::receiveRumorMessage(QVariantMap message) {
     // <”ChatText”,”Hi”> <”Origin”,”tiger”> <”SeqNo”,23>
-
+	printf("receive RumorMessage\n");
     if (!message.contains("ChatText") ||
         !message.contains("Origin") ||
         !message.contains("SeqNo")) {
@@ -146,7 +156,7 @@ void ChatDialog::receiveRumorMessage(QVariantMap message) {
 
 void ChatDialog::receiveStatusMessage(QVariantMap message) {
     // <"Want",<"tiger",4>> 4 is the message don't have
-
+	printf("receive StatusMessage\n");
     QVariantMap statusMap = qvariant_cast<QVariantMap>(message["Want"]);
     QList<QString> messageOriginList = statusMap.keys();
     for (QString origin: statusMap.keys()) {
@@ -166,6 +176,7 @@ void ChatDialog::receiveStatusMessage(QVariantMap message) {
 }
 
 void ChatDialog::sendRumorMessage(QString origin, quint32 seqno) {
+	printf("send RumorMessage\n");
 	QVariantMap message;
 	if (messageDict[origin].size() > seqno)
 	{	
@@ -178,6 +189,7 @@ void ChatDialog::sendRumorMessage(QString origin, quint32 seqno) {
 }
 
 void ChatDialog::sendStatusMessage(QString origin, quint32 seqno) {
+	printf("send StatusMessage\n");
 	QVariantMap message;
 	QVariantMap inner;
 
@@ -211,6 +223,7 @@ bool NetSocket::bind() {
     for (int p = myPortMin; p <= myPortMax; p++) {
         if (QUdpSocket::bind(p)) {
             qDebug() << "bound to UDP port " << p;
+            port = p;
             return true;
         }
     }

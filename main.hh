@@ -17,7 +17,8 @@ public:
 	bool bind();
 
 public:
-	int myPortMin, myPortMax;
+	quint16 myPortMin, myPortMax;
+	quint16 port;
 };
 
 class ChatDialog : public QDialog

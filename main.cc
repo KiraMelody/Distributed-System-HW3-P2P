@@ -173,12 +173,12 @@ void ChatDialog::receiveStatusMessage(QVariantMap message) {
     		quint32 last_seqno = messageDict[origin].size();
     		if (seqno > last_seqno) { // find this user need to update the message from origin
     			sendStatusMessage(origin, quint32(last_seqno + 1));
-    		} else {				  // find sender need to update the message from origin
+    		} else if (seqno < last_seqno) {				  // find sender need to update the message from origin
     			sendRumorMessage(origin, quint32(seqno + 1));
     		}
 
     	} else {
-			sendStatusMessage(origin, quint32(0));
+			sendStatusMessage(origin, quint32(1));
 		}
     }
 }

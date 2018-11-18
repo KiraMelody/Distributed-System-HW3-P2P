@@ -6,8 +6,6 @@
 #include <QLineEdit>
 #include <QUdpSocket>
 
-typedef QPair<QString, quint32> MessageKey;
-
 class ChatDialog : public QDialog
 {
 	Q_OBJECT
@@ -29,7 +27,7 @@ private:
 	QLineEdit *textline;
 	quint32 seqNo;
 	quint16 portNum;
-	QMap<MessageKey, QString> messageDict;
+	QMap<QString, QStringList> messageDict;
 };
 
 class NetSocket : public QUdpSocket

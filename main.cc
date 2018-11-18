@@ -71,6 +71,7 @@ void ChatDialog::receiveRumorMessage(QVariantMap message) {
     if (!message.contains("ChatText") ||
         !message.contains("Origin") ||
         !message.contains("SeqNo")) {
+        // Invalid message.
         qDebug() << "WARNING: Received invalid rumor message!";
         return;
     }
@@ -79,9 +80,12 @@ void ChatDialog::receiveRumorMessage(QVariantMap message) {
     QString messageOrigin = message["Origin"].toString();
     quint32 messageSeqNo = message["SeqNo"].toUint();
 
-    MessageKey messageKey = qMakePair(messageOrigin, messageSeqNo);
-    if (!messageDict.contains(messageKey)) {
-
+    if (messageDict.contains(messageKey) && messageDict[messageOrigin].length() > messageSeqNo) {
+        // skip duplicate.
+        return;
+    } else {
+        textview->append(messageOrigin + ": ");
+        textview->append(messageChatText);
     }
 }
 

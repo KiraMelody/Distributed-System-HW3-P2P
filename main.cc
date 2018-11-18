@@ -182,7 +182,7 @@ void ChatDialog::receiveStatusMessage(QVariantMap message) {
 }
 
 void ChatDialog::sendRumorMessage(QString origin, quint32 seqno) {
-    qDebug() << "send RumorMessage";
+    qDebug() << "sending RumorMessage from: " << origin << seqno;
 	QVariantMap message;
 	if (messageDict[origin].size() > seqno)
 	{	
@@ -195,7 +195,7 @@ void ChatDialog::sendRumorMessage(QString origin, quint32 seqno) {
 }
 
 void ChatDialog::sendStatusMessage(QString origin, quint32 seqno) {
-    qDebug() << "send StatusMessage";
+    qDebug() << "sending StatusMessage: " << origin << seqno;
 	QVariantMap message;
 	QVariantMap inner;
 

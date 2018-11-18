@@ -65,14 +65,6 @@ void ChatDialog::deserializeMessage(QByteArray datagram) {
     }
 }
 
-void ChatDialog::setTimeout() {
-    // Use QTimer
-}
-
-void ChatDialog::vectorClock() {
-    // Use QTimer
-}
-
 void ChatDialog::receiveRumorMessage(QVariantMap message) {
     // <”ChatText”,”Hi”> <”Origin”,”tiger”> <”SeqNo”,23>
 
@@ -89,12 +81,20 @@ void ChatDialog::receiveRumorMessage(QVariantMap message) {
 
     MessageKey messageKey = qMakePair(messageOrigin, messageSeqNo);
     if (!messageDict.contains(messageKey)) {
-        
+
     }
 }
 
 void ChatDialog::receiveStatusMessage(QVariantMap message) {
     // <"Want",<"tiger",4>>
+}
+
+void ChatDialog::setTimeout() {
+    // Use QTimer
+}
+
+void ChatDialog::vectorClock() {
+    // Use QTimer
 }
 
 NetSocket::NetSocket() {

@@ -14,7 +14,12 @@ class ChatDialog : public QDialog
 
 public:
 	ChatDialog();
+    void serializeMessage(QVariantMap message);
+    void deserializeMessage(QByteArray datagram);
 	void receiveRumorMessage(QVariantMap message);
+	void receiveStatusMessage(QVariantMap message);
+    void setTimeout();
+    void vectorClock();
 
 public slots:
 	void gotReturnPressed();

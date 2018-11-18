@@ -241,11 +241,6 @@ int main(int argc, char **argv) {
     ChatDialog dialog;
     dialog.show();
 
-    // Create a UDP network socket
-    NetSocket sock;
-    if (!sock.bind())
-        exit(1);
-
     // Enter the Qt main loop; everything else is event driven
     return app.exec();
 }

@@ -60,7 +60,7 @@ void ChatDialog::gotReturnPressed() {
     // Initially, just echo the string locally.
     // Insert some networking code here...
     qDebug() << "FIX: send message to other peers: " << textline->text();
-    textview->append("Me: " + textline->text());
+    textview->append("Me(" + originName + "): " + textline->text());
 
     // process the message vis socket
     QVariantMap message = buildRumorMessage(
@@ -162,8 +162,10 @@ void ChatDialog::receiveRumorMessage(
     quint32 last_seqno = quint32(messageDict[messageOrigin].size());
 
     if (messageSeqNo == last_seqno) {
-        textview->append(messageOrigin + ": ");
-        textview->append(messageChatText);
+        if (messageOrigin != originName) {
+            textview->append(messageOrigin + ": ");
+            textview->append(messageChatText);
+        }
     	messageDict[messageOrigin].append(messageChatText);
     	sendStatusMessage(senderHost, senderPort);
     	lastReceivedOrigin = messageOrigin;
@@ -285,7 +287,7 @@ void ChatDialog::rumorTimeout() {
 void ChatDialog::antiEntropyTimeout() {
     // Use QTimer
     qDebug() << "antiEntropy Timeout";
-    antiEntropyTimer->start(5000);
+    antiEntropyTimer->start(2000);
     quint16 randomPort = findPort();
     sendStatusMessage(QHostAddress::LocalHost, randomPort);
 }

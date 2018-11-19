@@ -290,6 +290,7 @@ void ChatDialog::rumor() {
     if (lastReceivedOrigin == "" || lastReceivedSeqno <= 0) {
         return;
     }
+    rumorTimer->stop();
     rumorTimer->start(RUMOR_TIMEOUT);
     sendRumorMessage(
             lastReceivedOrigin,
@@ -322,6 +323,7 @@ QVariantMap ChatDialog::buildStatusMessage() {
 void ChatDialog::rumorTimeout() {
     // Use QTimer
     qDebug() << "rumor Timeout";
+    rumor();
 }
 
 void ChatDialog::antiEntropyTimeout() {

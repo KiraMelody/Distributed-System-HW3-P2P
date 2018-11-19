@@ -24,7 +24,17 @@ public:
 	quint16 port;
 };
 
-struct ResponseTime {
+class ResponseTime {
+public:
+    qint64 ResponseTime(qint64 _sendTime, qint64 _recvTime) :
+            sendTime(_sendTime), recvTime(_recvTime) {}
+    qint64 responseTime() {
+        return sendTime <= recvTime ? (recvTime - sendTime) : sendTime;
+    }
+    bool operator < (const ResponseTime &rhs) const {
+        return responseTime() < rhs.responseTime();
+    }
+private:
     qint64 sendTime, recvTime;
 };
 

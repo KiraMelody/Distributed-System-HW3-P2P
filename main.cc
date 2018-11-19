@@ -20,6 +20,9 @@ ChatDialog::ChatDialog() {
 	}
     seqNo = 1;
 
+    rumorTimer = new QTimer(this);
+    antiEntropyTimer = new QTimer(this);
+    antiEntropyTimer->start(5000);
     // Read-only text box where we display messages from everyone.
     // This widget expands both horizontally and vertically.
     textview = new QTextEdit(this);
@@ -47,6 +50,10 @@ ChatDialog::ChatDialog() {
             this, SLOT(gotReturnPressed()));
     connect(socket, SIGNAL(readyRead()),
 			this, SLOT(receiveDatagrams()));
+    connect(rumorTimer, SIGNAL(timeout()),
+    		this, SLOT(rumorTimeout()));
+    connect(antiEntropyTimer, SIGNAL(timeout()), 
+    		this, SLOT(antiEntropyTimeout()));
 }
 
 void ChatDialog::gotReturnPressed() {
@@ -182,9 +189,9 @@ void ChatDialog::receiveStatusMessage(QVariantMap message) {
     	if (messageDict.contains(origin)) {
     		quint32 last_seqno = messageDict[origin].size();
     		if (seqno > last_seqno) { // find this user need to update the message from origin
-    			sendStatusMessage(origin, quint32(last_seqno + 1));
+    			sendStatusMessage(origin, quint32(last_seqno));
     		} else if (seqno < last_seqno) {				  // find sender need to update the message from origin
-    			sendRumorMessage(origin, quint32(seqno + 1));
+    			sendRumorMessage(origin, quint32(seqno));
     		}
 
     	} else {
@@ -216,12 +223,20 @@ void ChatDialog::sendStatusMessage(QString origin, quint32 seqno) {
 	serializeMessage(message);
 }
 
-void ChatDialog::setTimeout() {
+void ChatDialog::rumorTimeout() {
     // Use QTimer
+    // Todo: when to set rumor timer->start
+    qDebug() << "rumor Timeout";
 }
 
-void ChatDialog::vectorClock() {
+void ChatDialog::antiEntropyTimeout() {
     // Use QTimer
+    qDebug() << "antiEntropy Timeout";
+    antiEntropyTimer->start(5000);
+    quint16 randomPort = findPort();
+    // Todo
+    sendStatusMessage();
+
 }
 
 NetSocket::NetSocket() {

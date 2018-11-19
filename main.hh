@@ -45,7 +45,8 @@ private:
 	QTextEdit *textview;
 	QLineEdit *textline;
 	NetSocket *socket;
-	QTimer *timer;
+	QTimer *rumorTimer;
+	QTimer *antiEntropyTimer;
 	QString originName;
 	quint32 seqNo;
 	quint16 portNum;

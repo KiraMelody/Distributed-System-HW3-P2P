@@ -28,7 +28,6 @@ ChatDialog::ChatDialog() {
 
     rumorTimer = new QTimer(this);
     antiEntropyTimer = new QTimer(this);
-    antiEntropyTimer->start(ANTI_ENTROPY_TIMEOUT);
     // Read-only text box where we display messages from everyone.
     // This widget expands both horizontally and vertically.
     textview = new QTextEdit(this);
@@ -60,6 +59,8 @@ ChatDialog::ChatDialog() {
     		this, SLOT(rumorTimeout()));
     connect(antiEntropyTimer, SIGNAL(timeout()), 
     		this, SLOT(antiEntropyTimeout()));
+    sendStatusMessage(QHostAddress::LocalHost, findPort());
+    antiEntropyTimer->start(ANTI_ENTROPY_TIMEOUT);
 }
 
 void ChatDialog::gotReturnPressed() {

@@ -24,6 +24,10 @@ public:
 	quint16 port;
 };
 
+struct ResponseTime {
+    qint64 sendTime, recvTime;
+};
+
 class ChatDialog : public QDialog
 {
 	Q_OBJECT
@@ -67,7 +71,7 @@ private:
 	QMap<QString, QStringList> messageDict;
     QString lastReceivedOrigin;
     quint32 lastReceivedSeqno;
-    static const int ANTI_ENTROPY_TIMEOUT = 2000;
+    static const int ANTI_ENTROPY_TIMEOUT = 5000;
     static const int RUMOR_TIMEOUT = 1000;
 };
 

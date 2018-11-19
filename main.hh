@@ -34,6 +34,7 @@ public:
 	void receiveStatusMessage(QVariantMap message);
 	void sendStatusMessage(QString origin, quint32 seqno);
 	void sendRumorMessage(QString origin, quint32 seqno);
+    QVariantMap buildStatusMessage();
     void setTimeout();
     void vectorClock();
 
@@ -50,9 +51,6 @@ private:
 	quint32 seqNo;
 	quint16 portNum;
 	QMap<QString, QStringList> messageDict;
-
-    QHostAddress senderHost;
-    quint16 senderPort;
 };
 
 #endif // P2PAPP_MAIN_HH

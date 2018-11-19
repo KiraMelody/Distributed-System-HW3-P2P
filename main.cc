@@ -15,7 +15,8 @@ ChatDialog::ChatDialog() {
 		exit(1);
 	} else {
 		portNum = socket->port;
-		originName = QVariant(portNum).toString();
+		originName =
+		        QHostInfo.localHostName() + ": " + QVariant(portNum).toString();
         qDebug() << "origin name: " << originName;
         setWindowTitle(originName);
 	}

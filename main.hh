@@ -9,78 +9,98 @@
 #include <QHostInfo>
 #include <QUuid>
 
-class NetSocket : public QUdpSocket
-{
-	Q_OBJECT
+class NetSocket : public QUdpSocket {
+    Q_OBJECT
 
 public:
-	NetSocket();
+    NetSocket();
 
-	// Bind this socket to a P2Papp-specific default port.
-	bool bind();
+    // Bind this socket to a P2Papp-specific default port.
+    bool bind();
 
 public:
-	quint16 myPortMin, myPortMax;
-	quint16 port;
+    quint16 myPortMin, myPortMax;
+    quint16 port;
 };
 
 class ResponseTime {
 public:
-    ResponseTime(qint64 _sendTime, qint64 _recvTime):
-        sendTime(_sendTime), recvTime(_recvTime) {}
+    ResponseTime(qint64 _sendTime, qint64 _recvTime) : sendTime(_sendTime),
+                                                       recvTime(_recvTime) {}
+
     qint64 responseTime() const {
         return sendTime <= recvTime ? (recvTime - sendTime) : sendTime;
     }
-    bool operator < (const ResponseTime &rhs) const {
+
+    quint16 portNum() const {
+        return portNum;
+    }
+
+    bool operator<(const ResponseTime &rhs) const {
         return responseTime() < rhs.responseTime();
     }
+
 private:
+    quint16 portNum;
     qint64 sendTime, recvTime;
 };
 
-class ChatDialog : public QDialog
-{
-	Q_OBJECT
+class ChatDialog : public QDialog {
+    Q_OBJECT
 
 public:
-	ChatDialog();
+    ChatDialog();
 
 private:
+    void initResponseTime(quint16 portMin, quint16 portMax);
+
     quint16 findPort();
+
     void serializeMessage(
             QVariantMap message, QHostAddress destHost, quint16 destPort);
+
     void deserializeMessage(
             QByteArray datagram, QHostAddress senderHost, quint16 senderPort);
+
     void receiveRumorMessage(
             QVariantMap message, QHostAddress senderHost, quint16 senderPort);
+
     void receiveStatusMessage(
             QVariantMap message, QHostAddress senderHost, quint16 senderPort);
+
     void sendRumorMessage(
             QString origin,
             quint32 seqno,
             QHostAddress destHost,
             quint16 destPort);
+
     void sendStatusMessage(QHostAddress destHost, quint16 destPort);
+
     void rumor();
+
     QVariantMap buildRumorMessage(
             QString origin, quint32 seqno, QString charText);
+
     QVariantMap buildStatusMessage();
 
 public slots:
-	void gotReturnPressed();
+    void gotReturnPressed();
+
     void receiveDatagrams();
+
     void rumorTimeout();
+
     void antiEntropyTimeout();
 
 private:
-	QTextEdit *textview;
-	QLineEdit *textline;
-	NetSocket *socket;
-	QTimer *rumorTimer;
-	QTimer *antiEntropyTimer;
-	QString originName;
-	quint16 portNum;
-	QMap<QString, QStringList> messageDict;
+    QTextEdit *textview;
+    QLineEdit *textline;
+    NetSocket *socket;
+    QTimer *rumorTimer;
+    QTimer *antiEntropyTimer;
+    QString originName;
+    quint16 portNum;
+    QMap <QString, QStringList> messageDict;
     QString lastReceivedOrigin;
     quint32 lastReceivedSeqno;
     static const int ANTI_ENTROPY_TIMEOUT = 5000;

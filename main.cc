@@ -25,7 +25,7 @@ ChatDialog::ChatDialog() {
 
     rumorTimer = new QTimer(this);
     antiEntropyTimer = new QTimer(this);
-    antiEntropyTimer->start(5000);
+    antiEntropyTimer->start(ANTI_ENTROPY_TIMEOUT);
     // Read-only text box where we display messages from everyone.
     // This widget expands both horizontally and vertically.
     textview = new QTextEdit(this);
@@ -261,7 +261,7 @@ void ChatDialog::rumor() {
     if (lastReceivedOrigin == "" || lastReceivedSeqno <= 0) {
         return;
     }
-    rumorTimer->start(1000);
+    rumorTimer->start(RUMOR_TIMEOUT);
     sendRumorMessage(
             lastReceivedOrigin,
             lastReceivedSeqno,
@@ -298,7 +298,7 @@ void ChatDialog::rumorTimeout() {
 void ChatDialog::antiEntropyTimeout() {
     // Use QTimer
     qDebug() << "antiEntropy Timeout";
-    antiEntropyTimer->start(2000);
+    antiEntropyTimer->start(ANTI_ENTROPY_TIMEOUT);
     quint16 randomPort = findPort();
     sendStatusMessage(QHostAddress::LocalHost, randomPort);
 }

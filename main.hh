@@ -61,7 +61,6 @@ private:
 	QTimer *rumorTimer;
 	QTimer *antiEntropyTimer;
 	QString originName;
-	quint32 seqNo;
 	quint16 portNum;
 	QMap<QString, QStringList> messageDict;
     QString lastReceivedOrigin;

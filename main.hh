@@ -116,7 +116,7 @@ private:
     QString lastReceivedOrigin;
     quint32 lastReceivedSeqno;
     QMap <quint16, ResponseTime> responseTimeDict;
-    static const int ANTI_ENTROPY_TIMEOUT = 5000;
+    static const int ANTI_ENTROPY_TIMEOUT = 4000;
     static const int RUMOR_TIMEOUT = 1000;
 };
 

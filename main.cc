@@ -212,6 +212,9 @@ void ChatDialog::receiveStatusMessage(
                     sendRumorMessage(origin, curSeqno, senderHost, senderPort);
     		    }
     		}
+    	} else {
+            messageDict[origin] = (QStringList() << "");  // skip 0 index.
+            isWant = true;
     	}
     }
     if (isWant) {

@@ -149,21 +149,31 @@ void ChatDialog::receiveRumorMessage(QVariantMap message) {
     QString messageOrigin = message["Origin"].toString();
     quint32 messageSeqNo = message["SeqNo"].toUInt();
 
-    if ((messageDict.contains(messageOrigin) &&
-        messageDict[messageOrigin].length() != messageSeqNo) ||
-        (!messageDict.contains(messageOrigin) &&
-        messageSeqNo != 1)) {
-        // skip duplicate and disorder.
-        return;
-    } else {
-        textview->append(messageOrigin + ": ");
-        textview->append(messageChatText);
-        if (!messageDict.contains(messageOrigin)) {
-            messageDict[messageOrigin] = (QStringList() << ""); // skip 0 index.
-        }
-        messageDict[messageOrigin].append(messageChatText);
-        sendRumorMessage(messageOrigin, messageSeqNo);
+    // if ((messageDict.contains(messageOrigin) &&
+    //     messageDict[messageOrigin].length() != messageSeqNo) ||
+    //     (!messageDict.contains(messageOrigin) &&
+    //     messageSeqNo != 1)) {
+    // 	qDebug() << "skip message";
+    //     // skip duplicate and disorder.
+    //     return;
+    // } else {
+    textview->append(messageOrigin + ": ");
+    textview->append(messageChatText);
+    if (!messageDict.contains(messageOrigin)) {
+        messageDict[messageOrigin] = (QStringList() << ""); // skip 0 index.
     }
+    quint32 last_seqno = messageDict[messageOrigin].size();
+    if (messageSeqNo == last_seqno) {
+    	messageDict[messageOrigin].append(messageChatText);
+    	sendStatusMessage(messageOrigin, quint32(last_seqno + 1));
+    } else if (messageSeqNo < last_seqno) {
+    	sendRumorMessage(messageOrigin, last_seqno - 1);
+    } else {
+    	sendStatusMessage(messageOrigin, last_seqno);
+    }
+    messageDict[messageOrigin].append(messageChatText);
+    sendRumorMessage(messageOrigin, messageSeqNo);
+    // }
 }
 
 void ChatDialog::receiveStatusMessage(QVariantMap message) {

@@ -44,22 +44,24 @@ class ChatDialog : public QDialog
 
 public:
 	ChatDialog();
-	quint16 findPort();
+
+private:
+    quint16 findPort();
     void serializeMessage(
             QVariantMap message, QHostAddress destHost, quint16 destPort);
     void deserializeMessage(
             QByteArray datagram, QHostAddress senderHost, quint16 senderPort);
-	void receiveRumorMessage(
+    void receiveRumorMessage(
             QVariantMap message, QHostAddress senderHost, quint16 senderPort);
-	void receiveStatusMessage(
+    void receiveStatusMessage(
             QVariantMap message, QHostAddress senderHost, quint16 senderPort);
-	void sendRumorMessage(
+    void sendRumorMessage(
             QString origin,
             quint32 seqno,
             QHostAddress destHost,
             quint16 destPort);
-	void sendStatusMessage(QHostAddress destHost, quint16 destPort);
-	void rumor();
+    void sendStatusMessage(QHostAddress destHost, quint16 destPort);
+    void rumor();
     QVariantMap buildRumorMessage(
             QString origin, quint32 seqno, QString charText);
     QVariantMap buildStatusMessage();

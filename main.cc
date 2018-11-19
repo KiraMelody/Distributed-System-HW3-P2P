@@ -19,7 +19,7 @@ ChatDialog::ChatDialog() {
         qDebug() << "origin name: " << originName;
         setWindowTitle(originName);
 	}
-    seqNo = 1;
+    messageDict[originName] = (QStringList() << "");  // skip 0 index.
 	lastReceivedSeqno = -1;
 	lastReceivedOrigin = "";
 
@@ -66,9 +66,10 @@ void ChatDialog::gotReturnPressed() {
 
     // process the message vis socket
     QVariantMap message = buildRumorMessage(
-            originName, seqNo, QString(textline->text()));
+            originName,
+            messageDict[originName].size(),
+            QString(textline->text()));
 	receiveRumorMessage(message, QHostAddress::LocalHost, portNum);
-	seqNo += quint32(1);
 
     // Clear the textline to get ready for the next input message.
     textline->clear();

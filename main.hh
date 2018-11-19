@@ -27,6 +27,8 @@ public:
 
 class ResponseTime {
 public:
+    ResponseTime() : portNum(0), sendTime(0), recvTime(0) {}
+
     ResponseTime(quint16 _portNum, qint64 _sendTime, qint64 _recvTime)
             : portNum(_portNum), sendTime(_sendTime), recvTime(_recvTime) {}
 

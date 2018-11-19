@@ -25,19 +25,19 @@ public:
 
 class ResponseTime {
 public:
-    ResponseTime(qint64 _sendTime, qint64 _recvTime) : sendTime(_sendTime),
-                                                       recvTime(_recvTime) {}
+    ResponseTime(quint16 _portNum, qint64 _sendTime, qint64 _recvTime)
+            : portNum(_portNum), sendTime(_sendTime), recvTime(_recvTime) {}
 
-    qint64 responseTime() const {
+    qint64 getResponseTime() const {
         return sendTime <= recvTime ? (recvTime - sendTime) : sendTime;
     }
 
-    quint16 portNum() const {
+    quint16 getPortNum() {
         return portNum;
     }
 
     bool operator<(const ResponseTime &rhs) const {
-        return responseTime() < rhs.responseTime();
+        return getResponseTime() < rhs.getResponseTime();
     }
 
 private:

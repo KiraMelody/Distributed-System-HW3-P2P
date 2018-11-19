@@ -206,8 +206,8 @@ void ChatDialog::receiveStatusMessage(
     		    // find sender need to update the message from origin
     		    isSame = false;
     		    for (quint32 curSeqno = seqno;
-    		         seqno < last_seqno;
-    		         seqno += quint32(1)) {
+                     curSeqno < last_seqno;
+                     curSeqno += quint32(1)) {
                     sendRumorMessage(origin, curSeqno, senderHost, senderPort);
     		    }
     		}

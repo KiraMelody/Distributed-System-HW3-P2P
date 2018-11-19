@@ -5,6 +5,7 @@
 #include <QTextEdit>
 #include <QLineEdit>
 #include <QUdpSocket>
+#include <QTimer>
 
 class NetSocket : public QUdpSocket
 {
@@ -46,12 +47,12 @@ public:
     QVariantMap buildRumorMessage(
             QString origin, quint16 seqno, QString charText);
     QVariantMap buildStatusMessage();
-    void rumorTimeout();
-    void antiEntropyTimeout();
 
 public slots:
 	void gotReturnPressed();
     void receiveDatagrams();
+    void rumorTimeout();
+    void antiEntropyTimeout();
 
 private:
 	QTextEdit *textview;

@@ -159,7 +159,7 @@ void ChatDialog::receiveRumorMessage(
         messageDict[messageOrigin] = (QStringList() << "");  // skip 0 index.
     }
 
-    quint32 last_seqno = messageDict[messageOrigin].length();
+    quint32 last_seqno = quint32(messageDict[messageOrigin].length());
 
     if (messageSeqNo == last_seqno) {
         textview->append(messageOrigin + ": ");
@@ -227,7 +227,7 @@ void ChatDialog::sendRumorMessage(
     }
     qDebug() << "sending RumorMessage from: " << origin << seqno;
     if (!messageDict.contains(origin) ||
-        messageDict[origin].length() <= seqno) {
+        quint32(messageDict[origin].length()) <= seqno) {
         qDebug() << "invalid origin or seqno";
         return;
     }
@@ -266,7 +266,7 @@ QVariantMap ChatDialog::buildStatusMessage() {
     QVariantMap statusMessage;
     QVariantMap statusVector;
     for (QString origin: messageDict.keys()) {
-        statusVector[origin] = messageDict[origin].length();
+        statusVector[origin] = quint32(messageDict[origin].length());
     }
     statusMessage["Want"] = statusVector;
     return statusMessage;

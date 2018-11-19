@@ -42,7 +42,10 @@ public:
             QHostAddress destHost,
             quint16 destPort);
 	void sendStatusMessage(QHostAddress destHost, quint16 destPort);
+	void rumor();
     QVariantMap buildStatusMessage();
+    void rumorTimeout();
+    void antiEntropyTimeout();
 
 public slots:
 	void gotReturnPressed();
@@ -52,7 +55,8 @@ private:
 	QTextEdit *textview;
 	QLineEdit *textline;
 	NetSocket *socket;
-	QTimer *timer;
+	QTimer *rumorTimer;
+	QTimer *antiEntropyTimer;
 	QString originName;
 	quint32 seqNo;
 	quint16 portNum;

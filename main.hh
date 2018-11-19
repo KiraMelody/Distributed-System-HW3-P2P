@@ -45,7 +45,7 @@ public:
 	void sendStatusMessage(QHostAddress destHost, quint16 destPort);
 	void rumor();
     QVariantMap buildRumorMessage(
-            QString origin, quint16 seqno, QString charText);
+            QString origin, quint32 seqno, QString charText);
     QVariantMap buildStatusMessage();
 
 public slots:

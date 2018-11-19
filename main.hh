@@ -65,8 +65,8 @@ private:
 	QMap<QString, QStringList> messageDict;
     QString lastReceivedOrigin;
     quint32 lastReceivedSeqno;
-    static const ANTI_ENTROPY_TIMEOUT = 4000;
-    static const RUMOR_TIMEOUT = 1000;
+    const ANTI_ENTROPY_TIMEOUT = 4000;
+    const RUMOR_TIMEOUT = 1000;
 };
 
 #endif // P2PAPP_MAIN_HH

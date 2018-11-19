@@ -26,9 +26,9 @@ public:
 
 class ResponseTime {
 public:
-    qint64 ResponseTime(qint64 _sendTime, qint64 _recvTime) :
-            sendTime(_sendTime), recvTime(_recvTime) {}
-    qint64 responseTime() {
+    ResponseTime(qint64 _sendTime, qint64 _recvTime):
+        sendTime(_sendTime), recvTime(_recvTime) {}
+    qint64 responseTime() const {
         return sendTime <= recvTime ? (recvTime - sendTime) : sendTime;
     }
     bool operator < (const ResponseTime &rhs) const {

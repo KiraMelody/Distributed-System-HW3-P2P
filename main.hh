@@ -34,8 +34,8 @@ public:
 	void receiveStatusMessage(QVariantMap message);
 	void sendStatusMessage(QString origin, quint32 seqno);
 	void sendRumorMessage(QString origin, quint32 seqno);
-    void setTimeout();
-    void vectorClock();
+    void rumorTimeout();
+    void antiEntropyTimeout();
 
 public slots:
 	void gotReturnPressed();

@@ -7,6 +7,7 @@
 #include <QUdpSocket>
 #include <QTimer>
 #include <QHostInfo>
+#include <QUuid>
 
 class NetSocket : public QUdpSocket
 {

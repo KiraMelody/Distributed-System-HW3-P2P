@@ -116,7 +116,7 @@ void ChatDialog::initResponseTime(quint16 portMin, quint16 portMax) {
         if (port == portNum) {
             continue;
         }
-        responseTimeDict[port] = ResponseTime(port, curTime, curTime);
+        responseTimeDict.insert(port, ResponseTime(port, curTime, curTime));
     }
 }
 
@@ -134,7 +134,13 @@ void ChatDialog::serializeMessage(
     }
     qDebug() << "Sending message to port: " << destPort;
 
-    responseTimeDict[destPort].setSendTime(QDateTime::currentMSecsSinceEpoch());
+    qint64 curTime = QDateTime::currentMSecsSinceEpoch();
+    if (responseTimeDict.contains(destPort)) {
+        responseTimeDict[destPort].setSendTime(curTime);
+    } else {
+        responseTimeDict.insert(destPort,
+                                ResponseTime(destPort, curTime, curTime));
+    }
 
     socket->writeDatagram(
             datagram.data(),
@@ -147,8 +153,13 @@ void ChatDialog::deserializeMessage(
         QByteArray datagram, QHostAddress senderHost, quint16 senderPort) {
     // using QDataStream, and handle the message as appropriate
     // containing a ChatText key with a value of type QString
-    responseTimeDict[senderPort].setRecvTime(
-            QDateTime::currentMSecsSinceEpoch());
+    qint64 curTime = QDateTime::currentMSecsSinceEpoch();
+    if (responseTimeDict.contains(senderPort)) {
+        responseTimeDict[senderPort].setRecvTime(curTime);
+    } else {
+        responseTimeDict.insert(senderPort,
+                                ResponseTime(senderPort, curTime, curTime));
+    }
     qDebug() << "deserialize Message";
     QVariantMap message;
     QDataStream inStream(&datagram, QIODevice::ReadOnly);

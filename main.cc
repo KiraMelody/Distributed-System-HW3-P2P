@@ -7,9 +7,6 @@
 
 #include "main.hh"
 
-const ANTI_ENTROPY_TIMEOUT = 4000;
-const RUMOR_TIMEOUT = 1000;
-
 ChatDialog::ChatDialog() {
     setWindowTitle("P2Papp");
 

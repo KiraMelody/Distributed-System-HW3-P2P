@@ -8,6 +8,8 @@
 #include <QTimer>
 #include <QHostInfo>
 #include <QUuid>
+#include <QDateTime>
+#include <QtAlgorithms>
 
 class NetSocket : public QUdpSocket {
     Q_OBJECT
@@ -27,6 +29,14 @@ class ResponseTime {
 public:
     ResponseTime(quint16 _portNum, qint64 _sendTime, qint64 _recvTime)
             : portNum(_portNum), sendTime(_sendTime), recvTime(_recvTime) {}
+
+    void setSendTime(qint64 _sendTime) {
+        sendTime = _sendTime;
+    }
+
+    void setRecvTime(qint64 _recvTime) {
+        recvTime = _recvTime;
+    }
 
     qint64 getResponseTime() const {
         return sendTime <= recvTime ? (recvTime - sendTime) : sendTime;
@@ -103,6 +113,7 @@ private:
     QMap <QString, QStringList> messageDict;
     QString lastReceivedOrigin;
     quint32 lastReceivedSeqno;
+    QMap <quint16, ResponseTime> responseTimeDict;
     static const int ANTI_ENTROPY_TIMEOUT = 5000;
     static const int RUMOR_TIMEOUT = 1000;
 };

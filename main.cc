@@ -26,6 +26,8 @@ ChatDialog::ChatDialog() {
     lastReceivedSeqno = -1;
     lastReceivedOrigin = "";
 
+    initResponseTime(socket->myPortMin, socket->myPortMax);
+
     rumorTimer = new QTimer(this);
     antiEntropyTimer = new QTimer(this);
     // Read-only text box where we display messages from everyone.
@@ -97,16 +99,24 @@ void ChatDialog::receiveDatagrams() {
 }
 
 quint16 ChatDialog::findPort() {
-    if (portNum == socket->myPortMax) {
-        return portNum - 1;
-    } else if (portNum == socket->myPortMin) {
-        return portNum + 1;
-    } else {
-        if (qrand() % 2 == 0) {
-            return portNum - 1;
-        } else {
-            return portNum + 1;
+    QList <ResponseTime> responseTimeList = responseTimeDict.values();
+    if (responseTimeList.size() != socket->myPortMax - socket->myPortMin + 1) {
+        qDebug() << "invalid responseTimeList";
+        quint16 port = socket->myPortMin +
+                       (qrand() % (socket->myPortMax - socket->myPortMin));
+        return port < portNum ? port : port + 1;
+    }
+    qSort(responseTimeList.begin(), responseTimeList.end());
+    return responseTimeList[qrand() % 2].getPortNum();
+}
+
+void ChatDialog::initResponseTime(quint16 portMin, quint16 portMax) {
+    qint64 curTime = QDateTime::currentMSecsSinceEpoch();
+    for (quint16 port = portMin; port <= portMax; port++) {
+        if (port == portNum) {
+            continue;
         }
+        responseTimeDict[port] = ResponseTime(port, curTime, curTime);
     }
 }
 
@@ -124,6 +134,8 @@ void ChatDialog::serializeMessage(
     }
     qDebug() << "Sending message to port: " << destPort;
 
+    responseTimeDict[destPort].setSendTime(QDateTime::currentMSecsSinceEpoch());
+
     socket->writeDatagram(
             datagram.data(),
             datagram.size(),
@@ -135,6 +147,8 @@ void ChatDialog::deserializeMessage(
         QByteArray datagram, QHostAddress senderHost, quint16 senderPort) {
     // using QDataStream, and handle the message as appropriate
     // containing a ChatText key with a value of type QString
+    responseTimeDict[senderPort].setRecvTime(
+            QDateTime::currentMSecsSinceEpoch());
     qDebug() << "deserialize Message";
     QVariantMap message;
     QDataStream inStream(&datagram, QIODevice::ReadOnly);

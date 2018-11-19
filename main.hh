@@ -36,6 +36,7 @@ public:
 	void sendRumorMessage(QString origin, quint32 seqno);
     void rumorTimeout();
     void antiEntropyTimeout();
+    QVariantMap buildStatusMessage();
 
 public slots:
 	void gotReturnPressed();

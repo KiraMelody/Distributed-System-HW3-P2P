@@ -79,20 +79,24 @@ void ChatDialog::gotReturnPressed() {
     // Clear the textline to get ready for the next input message.
     textline->clear();
 }
-void ChatDialog::receiveDatagrams()
-{
+
+void ChatDialog::receiveDatagrams() {
     qDebug() << "receive datagram";
 	while (socket->hasPendingDatagrams()) {
 		QByteArray datagram;
 		datagram.resize(socket->pendingDatagramSize());
-		QHostAddress sender;
-		quint16 senderPort;
-	 
-		if(socket->readDatagram(datagram.data(), datagram.size(), &sender, &senderPort) != -1) {
-			deserializeMessage(datagram);
+        QHostAddress senderHost;
+        quint16 senderPort;
+		if(socket->readDatagram(
+		        datagram.data(),
+		        datagram.size(),
+		        &senderHost,
+		        &senderPort) != -1) {
+			deserializeMessage(datagram, senderHost, senderPort);
 		}
 	}
 }
+
 quint16 ChatDialog::findPort() {
 	if (portNum == socket->myPortMax) {
 		return portNum - 1;
@@ -107,7 +111,8 @@ quint16 ChatDialog::findPort() {
 	}
 }
 
-void ChatDialog::serializeMessage(QVariantMap message) {
+void ChatDialog::serializeMessage(
+        QVariantMap message, QHostAddress senderHost, quint16 senderPort) {
     // To serialize a message you’ll need to construct a QVariantMap describing
     // the message
     qDebug() << "serialize Message";
@@ -119,11 +124,15 @@ void ChatDialog::serializeMessage(QVariantMap message) {
     qDebug() << "Sending message to port: " << destPort;
 
 	socket->writeDatagram(
-	        datagram.data(), datagram.size(), QHostAddress::LocalHost, destPort);
+	        datagram.data(),
+	        datagram.size(),
+	        QHostAddress::LocalHost,
+	        destPort);
 	setTimeout();
 }
 
-void ChatDialog::deserializeMessage(QByteArray datagram) {
+void ChatDialog::deserializeMessage(
+        QByteArray datagram, QHostAddress senderHost, quint16 senderPort) {
     // using QDataStream, and handle the message as appropriate
     // containing a ChatText key with a value of type QString
     qDebug() << "deserialize Message";
@@ -131,13 +140,14 @@ void ChatDialog::deserializeMessage(QByteArray datagram) {
     QDataStream inStream(&datagram, QIODevice::ReadOnly);
     inStream >> message;
     if (message.contains("Want")) {
-        receiveStatusMessage(message);
+        receiveStatusMessage(message, senderHost, senderPort);
     } else {
-        receiveRumorMessage(message);
+        receiveRumorMessage(message, senderHost, senderPort);
     }
 }
 
-void ChatDialog::receiveRumorMessage(QVariantMap message) {
+void ChatDialog::receiveRumorMessage(
+        QVariantMap message, QHostAddress senderHost, quint16 senderPort) {
     // <”ChatText”,”Hi”> <”Origin”,”tiger”> <”SeqNo”,23>
     qDebug() << "receive RumorMessage";
     if (!message.contains("ChatText") ||
@@ -165,8 +175,12 @@ void ChatDialog::receiveRumorMessage(QVariantMap message) {
     if (!messageDict.contains(messageOrigin)) {
         messageDict[messageOrigin] = (QStringList() << ""); // skip 0 index.
     }
+
     quint32 last_seqno = messageDict[messageOrigin].size();
+
     if (messageSeqNo == last_seqno) {
+        textview->append(messageOrigin + ": ");
+        textview->append(messageChatText);
     	messageDict[messageOrigin].append(messageChatText);
     	sendStatusMessage(messageOrigin, quint32(last_seqno + 1));
     } else if (messageSeqNo < last_seqno) {
@@ -179,7 +193,8 @@ void ChatDialog::receiveRumorMessage(QVariantMap message) {
     // }
 }
 
-void ChatDialog::receiveStatusMessage(QVariantMap message) {
+void ChatDialog::receiveStatusMessage(
+        QVariantMap message, QHostAddress senderHost, quint16 senderPort) {
     // <"Want",<"tiger",4>> 4 is the message don't have
     qDebug() << "receive StatusMessage";
     QVariantMap statusMap = qvariant_cast<QVariantMap>(message["Want"]);
@@ -188,10 +203,12 @@ void ChatDialog::receiveStatusMessage(QVariantMap message) {
     	quint32 seqno = statusMap[origin].value<quint32>();
     	if (messageDict.contains(origin)) {
     		quint32 last_seqno = messageDict[origin].size();
-    		if (seqno > last_seqno) { // find this user need to update the message from origin
-    			sendStatusMessage(origin, quint32(last_seqno));
-    		} else if (seqno < last_seqno) {				  // find sender need to update the message from origin
-    			sendRumorMessage(origin, quint32(seqno));
+    		if (seqno > last_seqno) {
+    		    // find this user need to update the message from origin
+    			sendStatusMessage(origin, quint32(last_seqno + 1));
+    		} else if (seqno < last_seqno) {
+    		    // find sender need to update the message from origin
+    			sendRumorMessage(origin, quint32(seqno + 1));
     		}
 
     	} else {
@@ -200,11 +217,14 @@ void ChatDialog::receiveStatusMessage(QVariantMap message) {
     }
 }
 
-void ChatDialog::sendRumorMessage(QString origin, quint32 seqno) {
+void ChatDialog::sendRumorMessage(
+        QString origin,
+        quint32 seqno,
+        QHostAddress senderHost,
+        quint16 senderPort) {
     qDebug() << "sending RumorMessage from: " << origin << seqno;
 	QVariantMap message;
-	if (messageDict[origin].size() > seqno)
-	{	
+	if (messageDict[origin].size() > seqno) {
 		message.insert(QString("ChatText"), messageDict[origin].at(seqno));
 		message.insert(QString("Origin"), QString(origin));
 		message.insert(QString("SeqNo"), quint32(seqno));
@@ -213,7 +233,11 @@ void ChatDialog::sendRumorMessage(QString origin, quint32 seqno) {
 	}
 }
 
-void ChatDialog::sendStatusMessage(QString origin, quint32 seqno) {
+void ChatDialog::sendStatusMessage(
+        QString origin,
+        quint32 seqno,
+        QHostAddress senderHost,
+        quint16 senderPort) {
     qDebug() << "sending StatusMessage: " << origin << seqno;
 	QVariantMap message;
 	QVariantMap inner;
@@ -221,6 +245,16 @@ void ChatDialog::sendStatusMessage(QString origin, quint32 seqno) {
 	inner.insert(origin, seqno);
 	message.insert(QString("Want"), inner);
 	serializeMessage(message);
+}
+
+QVariantMap ChatDialog::buildStatusMessage() {
+    QVariantMap statusMessage;
+    QVariantMap statusVector;
+    for (QString origin: messageDict.keys()) {
+        statusVector[origin] = messageDict[origin].length();
+    }
+    statusMessage["Want"] = statusVector;
+    return statusMessage;
 }
 
 void ChatDialog::rumorTimeout() {
@@ -235,7 +269,7 @@ void ChatDialog::antiEntropyTimeout() {
     antiEntropyTimer->start(5000);
     quint16 randomPort = findPort();
     // Todo
-    sendStatusMessage();
+    // sendStatusMessage();
 
 }
 
@@ -277,4 +311,3 @@ int main(int argc, char **argv) {
     // Enter the Qt main loop; everything else is event driven
     return app.exec();
 }
-

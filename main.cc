@@ -19,6 +19,8 @@ ChatDialog::ChatDialog() {
         qDebug() << "origin name: " << originName;
 	}
     seqNo = 1;
+	lastReceivedSeqno = -1;
+	lastReceivedOrigin = "";
 
     rumorTimer = new QTimer(this);
     antiEntropyTimer = new QTimer(this);
@@ -60,7 +62,8 @@ void ChatDialog::gotReturnPressed() {
     // Initially, just echo the string locally.
     // Insert some networking code here...
     qDebug() << "FIX: send message to other peers: " << textline->text();
-    textview->append("Me(" + originName + "): " + textline->text());
+    textview->append("Me(" + originName + "): ");
+    textview->append(textline->text());
 
     // process the message vis socket
     QVariantMap message = buildRumorMessage(
@@ -250,6 +253,9 @@ void ChatDialog::sendStatusMessage(QHostAddress destHost, quint16 destPort) {
 }
 
 void ChatDialog::rumor() {
+    if (lastReceivedOrigin == "" || lastReceivedSeqno <= 0) {
+        return;
+    }
     rumorTimer->start(1000);
     sendRumorMessage(
             lastReceivedOrigin,

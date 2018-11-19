@@ -50,6 +50,9 @@ private:
 	quint32 seqNo;
 	quint16 portNum;
 	QMap<QString, QStringList> messageDict;
+
+    QHostAddress senderHost;
+    quint16 senderPort;
 };
 
 #endif // P2PAPP_MAIN_HH

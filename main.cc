@@ -78,11 +78,9 @@ void ChatDialog::receiveDatagrams()
 	while (socket->hasPendingDatagrams()) {
 		QByteArray datagram;
 		datagram.resize(socket->pendingDatagramSize());
-		QHostAddress sender;
-		quint16 senderPort;
 	 
 		if(socket->readDatagram(
-		        datagram.data(), datagram.size(), &sender, &senderPort) != -1) {
+		        datagram.data(), datagram.size(), &senderHost, &senderPort) != -1) {
 			deserializeMessage(datagram);
 		}
 	}

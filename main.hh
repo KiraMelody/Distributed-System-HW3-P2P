@@ -43,6 +43,8 @@ public:
             quint16 destPort);
 	void sendStatusMessage(QHostAddress destHost, quint16 destPort);
 	void rumor();
+    QVariantMap buildRumorMessage(
+            QString origin, quint16 seqno, QString charText);
     QVariantMap buildStatusMessage();
     void rumorTimeout();
     void antiEntropyTimeout();
@@ -61,6 +63,8 @@ private:
 	quint32 seqNo;
 	quint16 portNum;
 	QMap<QString, QStringList> messageDict;
+    QString lastReceivedOrigin;
+    quint32 lastReceivedSeqno;
 };
 
 #endif // P2PAPP_MAIN_HH

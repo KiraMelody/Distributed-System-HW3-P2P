@@ -63,10 +63,8 @@ void ChatDialog::gotReturnPressed() {
     textview->append("Me: " + textline->text());
 
     // process the message vis socket
-    QVariantMap message;
-    message["ChatText"] = QString(textline->text());
-    message["Origin"] = originName;
-    message["SeqNo"] = seqNo;
+    QVariantMap message = buildRumorMessage(
+            originName, seqNo, QString(textline->text()));
 	receiveRumorMessage(message, QHostAddress::LocalHost, portNum);
 	seqNo += quint32(1);
 
@@ -168,6 +166,8 @@ void ChatDialog::receiveRumorMessage(
         textview->append(messageChatText);
     	messageDict[messageOrigin].append(messageChatText);
     	sendStatusMessage(senderHost, senderPort);
+    	lastReceivedOrigin = messageOrigin;
+    	lastReceivedSeqno = messageSeqNo;
     	rumor();
     } else {
         sendStatusMessage(senderHost, senderPort);
@@ -182,6 +182,7 @@ void ChatDialog::receiveStatusMessage(
         qDebug() << "Invalid StatusMessage";
         return;
     }
+    rumorTimer->stop();
     QVariantMap statusVector = qvariant_cast<QVariantMap>(message["Want"]);
 
     bool isSame = true;
@@ -211,6 +212,7 @@ void ChatDialog::receiveStatusMessage(
     if (isSame) {
         if (qrand() % 2 == 0) {
             rumor();
+        }
     }
 }
 
@@ -229,10 +231,8 @@ void ChatDialog::sendRumorMessage(
         qDebug() << "invalid origin or seqno";
         return;
     }
-	QVariantMap rumorMessage;
-    rumorMessage["ChatText"] = messageDict[origin].at(seqno);
-    rumorMessage["Origin"] = origin;
-    rumorMessage["SeqNo"] = seqno;
+	QVariantMap rumorMessage =
+	        buildRumorMessage(origin, seqno, messageDict[origin].at(seqno));
     serializeMessage(rumorMessage, destHost, destPort);
 }
 
@@ -245,8 +245,21 @@ void ChatDialog::sendStatusMessage(QHostAddress destHost, quint16 destPort) {
 	serializeMessage(buildStatusMessage(), destHost, destPort);
 }
 
-void rumor() {
+void ChatDialog::rumor() {
+    rumorTimer->start(1000);
+    sendRumorMessage(
+            lastReceivedOrigin,
+            lastReceivedSeqno,
+            QHostAddress::LocalHost,
+            findPort());
+}
 
+QVariantMap buildRumorMessage(QString origin, quint32 seqno, QString charText) {
+    QVariantMap rumorMessage;
+    rumorMessage["ChatText"] = messageDict[origin].at(seqno);
+    rumorMessage["Origin"] = origin;
+    rumorMessage["SeqNo"] = seqno;
+    return rumorMessage;
 }
 
 QVariantMap ChatDialog::buildStatusMessage() {
@@ -261,7 +274,6 @@ QVariantMap ChatDialog::buildStatusMessage() {
 
 void ChatDialog::rumorTimeout() {
     // Use QTimer
-    // Todo: when to set rumor timer->start
     qDebug() << "rumor Timeout";
 }
 
@@ -270,9 +282,7 @@ void ChatDialog::antiEntropyTimeout() {
     qDebug() << "antiEntropy Timeout";
     antiEntropyTimer->start(5000);
     quint16 randomPort = findPort();
-    // Todo
-    // sendStatusMessage();
-
+    sendStatusMessage(QHostAddress::LocalHost, randomPort);
 }
 
 NetSocket::NetSocket() {

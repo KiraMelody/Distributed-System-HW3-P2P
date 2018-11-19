@@ -159,7 +159,7 @@ void ChatDialog::receiveRumorMessage(
         messageDict[messageOrigin] = (QStringList() << "");  // skip 0 index.
     }
 
-    quint32 last_seqno = quint32(messageDict[messageOrigin].length());
+    quint32 last_seqno = quint32(messageDict[messageOrigin].size());
 
     if (messageSeqNo == last_seqno) {
         textview->append(messageOrigin + ": ");
@@ -187,10 +187,12 @@ void ChatDialog::receiveStatusMessage(
 
     bool isSame = true;
     bool isWant = false;
-    for (QString origin: statusVector.keys()) {
+    QList<QString> keys = statusVector.keys();
+    for (int i = 0; i < keys.size(); i++) {
+        QString origin = keys[i];
     	quint32 seqno = statusVector[origin].value<quint32>();
     	if (messageDict.contains(origin)) {
-    		quint32 last_seqno = messageDict[origin].size();
+    		quint32 last_seqno = quint32(messageDict[origin].size());
     		if (seqno > last_seqno) {
     		    // find this user need to update the message from origin
     			isSame = false;
@@ -227,7 +229,7 @@ void ChatDialog::sendRumorMessage(
     }
     qDebug() << "sending RumorMessage from: " << origin << seqno;
     if (!messageDict.contains(origin) ||
-        quint32(messageDict[origin].length()) <= seqno) {
+        quint32(messageDict[origin].size()) <= seqno) {
         qDebug() << "invalid origin or seqno";
         return;
     }
@@ -254,9 +256,10 @@ void ChatDialog::rumor() {
             findPort());
 }
 
-QVariantMap buildRumorMessage(QString origin, quint32 seqno, QString charText) {
+QVariantMap ChatDialog::buildRumorMessage(
+        QString origin, quint32 seqno, QString charText) {
     QVariantMap rumorMessage;
-    rumorMessage["ChatText"] = messageDict[origin].at(seqno);
+    rumorMessage["ChatText"] = charText;
     rumorMessage["Origin"] = origin;
     rumorMessage["SeqNo"] = seqno;
     return rumorMessage;
@@ -265,8 +268,10 @@ QVariantMap buildRumorMessage(QString origin, quint32 seqno, QString charText) {
 QVariantMap ChatDialog::buildStatusMessage() {
     QVariantMap statusMessage;
     QVariantMap statusVector;
-    for (QString origin: messageDict.keys()) {
-        statusVector[origin] = quint32(messageDict[origin].length());
+    QList<QString> keys = messageDict.keys();
+    for (int i = 0; i < keys.size(); i++) {
+        QString origin = keys[i];
+        statusVector[origin] = quint32(messageDict[origin].size());
     }
     statusMessage["Want"] = statusVector;
     return statusMessage;

@@ -81,7 +81,8 @@ void ChatDialog::receiveDatagrams()
 		QHostAddress sender;
 		quint16 senderPort;
 	 
-		if(socket->readDatagram(datagram.data(), datagram.size(), &sender, &senderPort) != -1) {
+		if(socket->readDatagram(
+		        datagram.data(), datagram.size(), &sender, &senderPort) != -1) {
 			deserializeMessage(datagram);
 		}
 	}
@@ -112,7 +113,10 @@ void ChatDialog::serializeMessage(QVariantMap message) {
     qDebug() << "Sending message to port: " << destPort;
 
 	socket->writeDatagram(
-	        datagram.data(), datagram.size(), QHostAddress::LocalHost, destPort);
+	        datagram.data(),
+	        datagram.size(),
+	        QHostAddress::LocalHost,
+	        destPort);
 	setTimeout();
 }
 
@@ -171,9 +175,11 @@ void ChatDialog::receiveStatusMessage(QVariantMap message) {
     	quint32 seqno = statusMap[origin].value<quint32>();
     	if (messageDict.contains(origin)) {
     		quint32 last_seqno = messageDict[origin].size();
-    		if (seqno > last_seqno) { // find this user need to update the message from origin
+    		if (seqno > last_seqno) {
+    		    // find this user need to update the message from origin
     			sendStatusMessage(origin, quint32(last_seqno + 1));
-    		} else if (seqno < last_seqno) {				  // find sender need to update the message from origin
+    		} else if (seqno < last_seqno) {
+    		    // find sender need to update the message from origin
     			sendRumorMessage(origin, quint32(seqno + 1));
     		}
 
@@ -186,8 +192,7 @@ void ChatDialog::receiveStatusMessage(QVariantMap message) {
 void ChatDialog::sendRumorMessage(QString origin, quint32 seqno) {
     qDebug() << "sending RumorMessage from: " << origin << seqno;
 	QVariantMap message;
-	if (messageDict[origin].size() > seqno)
-	{	
+	if (messageDict[origin].size() > seqno) {
 		message.insert(QString("ChatText"), messageDict[origin].at(seqno));
 		message.insert(QString("Origin"), QString(origin));
 		message.insert(QString("SeqNo"), quint32(seqno));
@@ -252,4 +257,3 @@ int main(int argc, char **argv) {
     // Enter the Qt main loop; everything else is event driven
     return app.exec();
 }
-

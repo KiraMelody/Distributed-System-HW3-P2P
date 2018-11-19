@@ -6,6 +6,7 @@
 #include <QLineEdit>
 #include <QUdpSocket>
 #include <QTimer>
+#include <QHostInfo>
 
 class NetSocket : public QUdpSocket
 {

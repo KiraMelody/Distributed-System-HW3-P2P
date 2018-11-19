@@ -17,6 +17,7 @@ ChatDialog::ChatDialog() {
 		portNum = socket->port;
 		originName = QVariant(portNum).toString();
         qDebug() << "origin name: " << originName;
+        setWindowTitle(originName);
 	}
     seqNo = 1;
 	lastReceivedSeqno = -1;

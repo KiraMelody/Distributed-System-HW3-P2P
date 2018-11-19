@@ -28,15 +28,21 @@ class ChatDialog : public QDialog
 public:
 	ChatDialog();
 	quint16 findPort();
-    void serializeMessage(QVariantMap message);
-    void deserializeMessage(QByteArray datagram);
-	void receiveRumorMessage(QVariantMap message);
-	void receiveStatusMessage(QVariantMap message);
-	void sendStatusMessage(QString origin, quint32 seqno);
-	void sendRumorMessage(QString origin, quint32 seqno);
+    void serializeMessage(
+            QVariantMap message, QHostAddress destHost, quint16 destPort);
+    void deserializeMessage(
+            QByteArray datagram, QHostAddress senderHost, quint16 senderPort);
+	void receiveRumorMessage(
+            QVariantMap message, QHostAddress senderHost, quint16 senderPort);
+	void receiveStatusMessage(
+            QVariantMap message, QHostAddress senderHost, quint16 senderPort);
+	void sendRumorMessage(
+            QString origin,
+            quint32 seqno,
+            QHostAddress destHost,
+            quint16 destPort);
+	void sendStatusMessage(QHostAddress destHost, quint16 destPort);
     QVariantMap buildStatusMessage();
-    void setTimeout();
-    void vectorClock();
 
 public slots:
 	void gotReturnPressed();
